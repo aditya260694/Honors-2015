@@ -1,0 +1,486 @@
+$atomic_int_get_gcc
+pointer to volatile int
+int
+__sync_synchronize()
+$atomic_int_set_gcc
+pointer to volatile int
+int
+void
+__sync_synchronize()
+$atomic_int_add_and_fetch_gcc
+pointer to volatile int
+int
+int
+__sync_add_and_fetch(pointer to volatile int,int)
+$atomic_ptr_cas_gcc
+pointer to pointer to void
+pointer to void
+pointer to void
+pointer to void
+__sync_val_compare_and_swap(volatile pointer to pointer to void,pointer to void,pointer to void)
+$av_strnlen
+pointer to const char
+size_t
+size_t
+size_t
+int
+$av_toupper
+int
+int
+char
+char
+int
+$av_tolower
+int
+int
+char
+char
+int
+$av_bprint_is_complete
+pointer to const AVBPrint
+int
+$av_make_q
+int
+int
+AVRational
+AVRational
+$av_cmp_q
+AVRational
+AVRational
+int
+const int64_t
+int64_t
+int64_t
+int
+int
+int
+int
+int
+int
+$av_q2d
+AVRational
+double
+double
+$av_inv_q
+AVRational
+AVRational
+AVRational
+$av_clip_c
+int
+int
+int
+int
+$av_clip64_c
+int64_t
+int64_t
+int64_t
+int64_t
+$av_clip_uint8_c
+int
+uint8_t
+int
+int
+$av_clip_int8_c
+int
+int8_t
+int
+int
+int
+int
+$av_clip_uint16_c
+int
+uint16_t
+int
+int
+$av_clip_int16_c
+int
+int16_t
+int
+int
+int
+int
+$av_clipl_int32_c
+int64_t
+int32_t
+int
+UINT64_C(int)
+int32_t
+int
+int
+int32_t
+$av_clip_intp2_c
+int
+int
+int
+int
+int
+int
+int
+int
+int
+$av_clip_uintp2_c
+int
+int
+unsigned
+int
+int
+int
+int
+int
+$av_mod_uintp2_c
+unsigned
+unsigned
+unsigned
+int
+int
+$av_sat_add32_c
+int
+int
+int
+av_clipl_int32_c()
+$av_sat_dadd32_c
+int
+int
+int
+av_sat_add32_c(int,)
+$av_clipf_c
+float
+float
+float
+float
+$av_clipd_c
+double
+double
+double
+double
+$av_ceil_log2_c
+int
+int
+av_log2(int)
+$av_popcount_c
+uint32_t
+int
+int
+int
+int
+int
+int
+int
+int
+int
+int
+int
+$av_popcount64_c
+uint64_t
+int
+av_popcount_c()
+av_popcount_c()
+$av_make_error_string
+pointer to char
+size_t
+int
+pointer to char
+av_strerror(int,pointer to char,size_t)
+$av_malloc_array
+size_t
+size_t
+pointer to void
+int
+int
+av_malloc(size_t)
+$av_mallocz_array
+size_t
+size_t
+pointer to void
+int
+int
+av_mallocz(size_t)
+$av_size_mult
+size_t
+size_t
+pointer to size_t
+int
+size_t
+size_t
+int
+size_t
+int
+int
+$av_int2float
+uint32_t
+float
+
+$av_float2int
+float
+uint32_t
+
+$av_int2double
+uint64_t
+double
+
+$av_double2int
+double
+uint64_t
+
+$av_x_if_null
+pointer to const void
+pointer to const void
+pointer to void
+pointer to void
+intptr_t()
+$avio_tell
+pointer to AVIOContext
+int64_t
+avio_seek(pointer to AVIOContext,int,int)
+$ffio_wfourcc
+pointer to AVIOContext
+pointer to const uint8_t
+void
+avio_wl32(pointer to AVIOContext,)
+$is_dos_path
+pointer to const char
+int
+int
+$ff_rename
+pointer to const char
+pointer to const char
+pointer to void
+int
+int
+int
+rename(pointer to const char,pointer to const char)
+int
+av_log(pointer to void,int,string,pointer to const char,pointer to const char)
+$av_iformat_next
+pointer to const AVInputFormat
+pointer to AVInputFormat
+$av_oformat_next
+pointer to const AVOutputFormat
+pointer to AVOutputFormat
+$av_register_input_format
+pointer to AVInputFormat
+void
+pointer to pointer to AVInputFormat
+int
+atomic_ptr_cas_gcc(,int,pointer to AVInputFormat)
+$av_register_output_format
+pointer to AVOutputFormat
+void
+pointer to pointer to AVOutputFormat
+int
+atomic_ptr_cas_gcc(,int,pointer to AVOutputFormat)
+$av_match_ext
+pointer to const char
+pointer to const char
+int
+pointer to const char
+int
+strrchr(pointer to const char,char)
+av_match_name(pointer to const char,pointer to const char)
+int
+$av_guess_format
+pointer to const char
+pointer to const char
+pointer to const char
+pointer to AVOutputFormat
+pointer to AVOutputFormat
+int
+pointer to AVOutputFormat
+int
+int
+av_filename_number_test(pointer to const char)
+ff_guess_image2_codec(pointer to const char)
+av_guess_format(string,int,int)
+int
+int
+av_oformat_next(pointer to AVOutputFormat)
+int
+av_match_name(pointer to const char,pointer to const char)
+int
+strcmp(pointer to const char,pointer to const char)
+int
+av_match_ext(pointer to const char,pointer to const char)
+int
+$av_guess_codec
+pointer to AVOutputFormat
+pointer to const char
+pointer to const char
+pointer to const char
+
+
+av_match_name(string,pointer to const char)
+av_match_name(string,pointer to const char)
+pointer to AVOutputFormat
+av_guess_format(int,pointer to const char,int)
+
+strcmp(pointer to const char,string)
+strcmp(pointer to const char,string)
+ff_guess_image2_codec(pointer to const char)
+$av_find_input_format
+pointer to const char
+pointer to AVInputFormat
+pointer to AVInputFormat
+int
+av_iformat_next(pointer to AVInputFormat)
+av_match_name(pointer to const char,pointer to const char)
+int
+$av_probe_input_format3
+pointer to AVProbeData
+int
+pointer to int
+pointer to AVInputFormat
+AVProbeData
+pointer to AVInputFormat
+int
+pointer to AVInputFormat
+int
+int
+int
+int
+int
+int
+ff_id3v2_match(pointer to unsigned char,string)
+int
+ff_id3v2_tag_len(pointer to unsigned char)
+int
+int
+int
+int
+int
+int
+av_iformat_next(pointer to AVInputFormat)
+int
+strcmp(pointer to const char,string)
+int
+fmt1(pointer to AVProbeData)
+av_log(int,int,string,pointer to const char,int,int)
+av_match_ext(pointer to const char,pointer to const char)
+int
+int
+int
+int
+int
+int
+int
+int
+int
+int
+int
+int
+av_match_ext(pointer to const char,pointer to const char)
+int
+av_match_name(pointer to const char,pointer to const char)
+int
+int
+int
+int
+int
+int
+int
+int
+int
+int
+$av_probe_input_format2
+pointer to AVProbeData
+int
+pointer to int
+pointer to AVInputFormat
+int
+pointer to AVInputFormat
+av_probe_input_format3(pointer to AVProbeData,int,pointer to int)
+int
+$av_probe_input_format
+pointer to AVProbeData
+int
+pointer to AVInputFormat
+int
+int
+av_probe_input_format2(pointer to AVProbeData,int,pointer to int)
+$av_probe_input_buffer2
+pointer to AVIOContext
+pointer to pointer to AVInputFormat
+pointer to const char
+pointer to void
+unsigned int
+unsigned int
+int
+AVProbeData
+string
+pointer to uint8_t
+int
+int
+int
+int
+int
+int
+int
+int
+int
+int
+int
+int
+av_log(pointer to void,int,string,unsigned int,int)
+pointer to uint8_t
+int
+pointer to char
+av_opt_get(pointer to AVIOContext,string,int,pointer to pointer to uint8_t)
+pointer to const char
+strchr(pointer to const char,char)
+int
+char
+int
+int
+int
+int
+int
+int
+int
+int
+int
+int
+av_reallocp(pointer to pointer to uint8_t,int)
+int
+avio_read(pointer to AVIOContext,pointer to uint8_t,int)
+int
+int
+char
+char
+int
+char
+int
+unsigned
+char
+int
+int
+int
+memset(pointer to unsigned char,int,int)
+av_probe_input_format2(pointer to AVProbeData,int,pointer to int)
+int
+int
+av_log(pointer to void,int,string,pointer to const char,int)
+av_log(pointer to void,int,string,pointer to const char,int,int)
+int
+char
+char
+int
+char
+int
+unsigned
+char
+int
+ffio_rewind_with_probe_data(pointer to AVIOContext,pointer to pointer to uint8_t,int)
+int
+av_freep(pointer to pointer to const char)
+int
+$av_probe_input_buffer
+pointer to AVIOContext
+pointer to pointer to AVInputFormat
+pointer to const char
+pointer to void
+unsigned int
+unsigned int
+int
+int
+av_probe_input_buffer2(pointer to AVIOContext,pointer to pointer to AVInputFormat,pointer to const char,pointer to void,unsigned int,unsigned int)
+int
+int

@@ -1,0 +1,21 @@
+$HashPrint
+pointer to Hash
+pointer to pointer to char
+pointer to pointer to char
+pointer to void
+void
+char
+int
+func2(char)
+func3(pointer to unsigned int)
+long long int
+pointer to Node
+PrintFunc(pointer to Node,pointer to Node)
+$func1
+unsigned int
+pointer to struct foo
+char
+int
+pointer to struct bar
+func2(unsigned int)
+func3(pointer to struct foo)

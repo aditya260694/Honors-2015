@@ -1,0 +1,352 @@
+#from __future__ import print_function
+import sys
+
+sys.path.extend(['./pycparser-2.10'])
+
+from pycparser import c_parser, c_ast, parse_file
+
+globalVars = {}
+localVars = {}
+globalStructs = {}
+
+def _explain_decl_node(decl_node):
+    """ Receives a c_ast.Decl note and returns its explanation in
+        English.
+    """
+    #~ print decl_node.show()
+    storage = ' '.join(decl_node.storage) + ' ' if decl_node.storage else ''
+        
+    return (decl_node.name + 
+            " is a " + 
+            storage + 
+            _explain_type(decl_node.type))
+
+
+def _explain_type(decl):
+    """ Recursively explains a type decl node
+    """
+    typ = type(decl)
+    
+    if typ == c_ast.TypeDecl:
+        quals = ' '.join(decl.quals) + ' ' if decl.quals else ''
+	if type(decl.type)==c_ast.Struct and decl.type.name==None:
+		if decl.type.decls != None:
+			globalStructs['struct ' + decl.declname] = {}	
+			for i in decl.type.decls:
+				globalStructs['struct ' + decl.declname][i.name] = _explain_type(i)	
+    			return quals + 'struct ' + decl.declname
+		else:
+			return quals + ''	
+        return quals + str(_explain_type(decl.type))
+
+    elif typ == c_ast.Typename:
+        return _explain_type(decl.type)
+   
+    elif typ == c_ast.Decl:
+        return _explain_type(decl.type)
+    		
+
+    elif typ == c_ast.IdentifierType:
+        return ' '.join(decl.names)
+
+    elif typ == c_ast.PtrDecl:
+        quals = ' '.join(decl.quals) + ' ' if decl.quals else ''
+        return quals + 'pointer to ' + str(_explain_type(decl.type))
+
+    elif typ == c_ast.ArrayDecl:
+        arr = 'pointer to '
+        return arr + str(_explain_type(decl.type))
+    		
+    elif typ == c_ast.FuncDecl:
+    	if decl.args:
+            params = [_explain_type(param) for param in decl.args.params]
+            args = ', '.join(params)
+        else:
+            args = ''
+        return ('function(%s) returning ' % (args) + str(_explain_type(decl.type)))
+
+    elif typ == c_ast.FuncDef:
+    	return decl.decl.name
+	
+    elif typ == c_ast.Struct:
+	if decl.decls != None:
+		globalStructs['struct ' + decl.name] = {}	
+		for i in decl.decls:
+			globalStructs['struct ' + decl.name][i.name] = _explain_type(i)	
+    	return 'struct ' + decl.name
+    else :
+	return ''
+
+def cleanPointer(i):
+	while i.startswith('pointer to '):
+		i = i[11:]
+	return i
+
+def structRefPrint(Node):
+	if type(Node.name) == c_ast.ID and type(Node.field) == c_ast.ID:
+		i = cleanPointer(get_type(Node.name.name))
+		return globalStructs[i][Node.field.name]
+	elif type(Node.name) == c_ast.StructRef and type(Node.field) == c_ast.ID:
+		return globalStructs[structRefPrint(Node.name)][Node.field.name]
+	elif type(Node.name) == c_ast.UnaryOp and type(Node.field) == c_ast.ID:
+		f = ""		
+		if type(Node.name.expr) == c_ast.ID:			
+			f = get_type(Node.name.expr.name)[11:]
+		elif type(i.expr) == c_ast.UnaryOp:
+			f = structRefPrint(Node.name.expr)[11:]
+		f = cleanPointer(f)
+		return globalStructs[f][Node.field.name]
+
+def get_type(i):
+	if i in localVars:			
+		return localVars[i]	
+	else:
+		return globalVars[i]
+
+def find_type2(i):
+	f = ""
+	if type(i) == c_ast.ID:
+		f = get_type(i.name)
+	if type(i) == c_ast.StructRef:		
+		f = structRefPrint(i)
+	if type(i) == c_ast.Constant:
+		f = i.type
+	if type(i) == c_ast.UnaryOp:
+		if i.op == '*':
+			if type(i.expr) == c_ast.ID:			
+				f = get_type(i.expr.name)[11:]
+			elif type(i.expr) == c_ast.UnaryOp:
+				f = find_type2(i.expr)[11:]
+		if i.op == '&':
+			if type(i.expr) == c_ast.ID:			
+				f = get_type(i.expr.name)
+			elif type(i.expr) == c_ast.UnaryOp:
+				f = find_type2(i.expr)	
+			f = 'pointer to ' + f			
+	if type(i) == c_ast.BinaryOp:
+		f = find_type2(i.left)	
+	return f
+	
+def find_type(Node):
+	return_list = []
+	f = []
+	for i in Node.exprs:
+		f.append(find_type2(i))
+	return f
+
+def recurse_type(Node):
+	typ = type(Node)
+	#print('%s' % typ)
+	return_list = []
+	if typ == c_ast.TypeDecl:
+		return_list.append(_explain_type(Node))
+
+	elif typ == c_ast.Assignment:
+		return_list+=recurse_type(Node.lvalue)
+		return_list+=recurse_type(Node.rvalue)
+		
+
+	elif typ == c_ast.BinaryOp:
+		return_list+=recurse_type(Node.left)
+		return_list+=recurse_type(Node.right)
+	
+	elif typ == c_ast.Case:
+		return_list+=recurse_type(Node.expr)
+		for i in Node.stmts:
+			return_list+=recurse_type(i)
+
+	elif typ == c_ast.Cast:
+		return_list+=recurse_type(Node.to_type)
+		return_list+=recurse_type(Node.expr)
+
+	elif typ == c_ast.Compound:
+		for i in Node.block_items:
+			return_list+=recurse_type(i)
+
+	elif typ == c_ast.CompoundLiteral:
+		return_list+=recurse_type(Node.type)
+		return_list+=recurse_type(Node.init)
+	
+	elif typ == c_ast.Constant:
+		return_list.append(Node.type)
+
+	elif typ == c_ast.Decl:
+		return_list+=recurse_type(Node.type)
+		return_list+=recurse_type(Node.init)
+		return_list+=recurse_type(Node.bitsize)
+		localVars[Node.name] = str(_explain_type(Node))
+
+	elif typ == c_ast.DeclList:
+		for i in Node.decls:
+			return_list+=recurse_type(i)
+
+	elif typ == c_ast.Default:
+		for i in Node.stmts:
+			return_list+=recurse_type(i)
+
+	elif typ == c_ast.DoWhile:
+		return_list+=recurse_type(Node.cond)
+		return_list+=recurse_type(Node.stmt)
+		
+	elif typ == c_ast.Enum:
+		return_list+=recurse_type(Node.values)
+
+	elif typ == c_ast.Enumerator:
+		return_list+=recurse_type(Node.value)
+
+	elif typ == c_ast.EnumeratorList:
+		for i in Node.enumerators:
+			return_list+=recurse_type(i)
+
+	elif typ == c_ast.ExprList:
+		for i in Node.exprs:
+			return_list+=recurse_type(i)
+	
+	elif typ == c_ast.FileAST:
+		for i in Node.ext:
+			return_list+=recurse_type(i)
+		
+	
+	elif typ == c_ast.For:
+		return_list+=recurse_type(Node.init)
+		return_list+=recurse_type(Node.cond)
+		return_list+=recurse_type(Node.next)
+		return_list+=recurse_type(Node.stmt)
+		
+
+
+	elif typ == c_ast.FuncCall:
+		#print type(Node.name),type(Node.name.name)
+		if type(Node.name.name) == c_ast.ID:
+			f = Node.name.name.name + "("
+		else:		
+			f = Node.name.name + "("
+		if Node.args != None:
+			for i in find_type(Node.args):
+				f = f + i + ","
+			if f[-1] != '(':
+				f = f[:-1]
+		f = f + ")"
+		return_list.append(f)
+		#return_list+=recurse_type(Node.args)
+	
+	elif typ == c_ast.FuncDecl:
+		return_list+=recurse_type(Node.args)
+		return_list+=recurse_type(Node.type)
+	
+	elif typ == c_ast.FuncDef:
+		return_list+=recurse_type(Node.decl)
+		return_list+=recurse_type(Node.body)
+
+		if Node.param_decls != None:
+			for i in Node.param_decls:
+				return_list+=recurse_type(i)
+
+	elif typ == c_ast.If:
+		return_list+=recurse_type(Node.cond)
+		return_list+=recurse_type(Node.iftrue)
+		return_list+=recurse_type(Node.iffalse)
+	
+	elif typ == c_ast.InitList:
+		for i in Node.exprs:
+			return_list+=recurse_type(i)
+
+	elif typ == c_ast.IdentifierType:
+		return_list.append(_explain_type(Node))
+
+	elif typ == c_ast.Label:
+		return_list+=recurse_type(Node.stmt)
+		
+	elif typ == c_ast.NamedInitializer:
+		return_list+=recurse_type(Node.expr)
+		for i in Node.name:
+			return_list+=recurse_type(i)
+		
+
+	elif typ == c_ast.ParamList:
+		for i in Node.params:
+			return_list+=recurse_type(i)
+
+
+	elif typ == c_ast.PtrDecl:
+		x = recurse_type(Node.type)		
+		for var in x:
+			return_list.append("pointer to " + str(var))
+		
+	elif typ == c_ast.Return:
+		return_list+=recurse_type(Node.expr)
+		
+
+	elif typ == c_ast.Struct:
+		for i in Node.decls:
+			return_list+=recurse_type(i)
+		
+	
+	elif typ == c_ast.StructRef:
+		return_list+=recurse_type(Node.name)
+		return_list+=recurse_type(Node.field)
+		
+	elif typ == c_ast.Switch:
+		return_list+=recurse_type(Node.cond)
+		return_list+=recurse_type(Node.stmt)
+
+
+	elif typ == c_ast.TernaryOp:
+		return_list+=recurse_type(Node.cond)
+		return_list+=recurse_type(Node.iftrue)
+		return_list+=recurse_type(Node.iffalse)
+
+	
+	elif typ == c_ast.TypeDecl:
+		return_list+=recurse_type(Node.type)
+		
+	elif typ == c_ast.Typedef:
+		return_list+=recurse_type(Node.type)
+		
+	elif typ == c_ast.Typename:
+		return_list+=recurse_type(Node.type)
+
+	elif typ == c_ast.UnaryOp:
+		return_list+=recurse_type(Node.expr)
+
+
+	elif typ == c_ast.Union:
+		for i in Node.decls:
+			return_list+=recurse_type(i)
+	
+	elif typ == c_ast.While:
+		return_list+=recurse_type(Node.cond)
+		return_list+=recurse_type(Node.stmt)
+
+	return return_list
+
+
+if __name__ == '__main__':
+	s = raw_input()
+	ast = parse_file(s,use_cpp = True,cpp_args=[r'-I/home/aditya/Honors/2015/pycparser-2.10/utils/fake_libc_include/',r'-I/media/01CDF70B3FE14040/FFmpeg-master'])
+	#ast.show()
+	apilist = {}
+
+	for i in ast.ext:
+		if type(i) == c_ast.FuncDef:
+			localVars = {}
+			print('$%s' % _explain_type(i))
+			func_name = _explain_type(i)
+			apilist[func_name] = []
+			for j in recurse_type(i):	
+				print('%s' % j)
+				apilist[func_name].append(j)
+		elif type(i) == c_ast.Decl or type(i) == c_ast.PtrDecl:
+			t = str(_explain_type(i))			
+			if i.name != None:
+				globalVars[i.name] = t
+				
+		elif type(i) == c_ast.Typedef:
+			#print "#####  " + i.name		
+			#print type(i.type)			
+			if type(i.type.type) == c_ast.Struct:
+				t = str(_explain_type(i.type))
+				try:				
+					globalStructs[i.name] = globalStructs[t]
+				except KeyError:
+					continue

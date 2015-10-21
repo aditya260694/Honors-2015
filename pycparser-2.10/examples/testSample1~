@@ -1,0 +1,36 @@
+typedef int Node, Hash;
+int global1;
+Node* global2;
+lon long int temp;
+void HashPrint(Hash* hash, void (*PrintFunc)(char*, char*))
+{
+    unsigned int i[100];
+    char c;
+    if (hash == NULL || hash->heads == NULL)
+	{int test;d = func2(c);}
+    else
+	{d = func3(i);}
+    long long int j;
+    for (i = 0; i < hash->table_size; ++i)
+    {
+        Node* temp = hash->heads[i];
+        while (temp != NULL)
+        {
+            PrintFunc(temp, temp);
+            temp = temp->next;
+        }
+    }
+}
+
+static char func1(unsigned int a, struct foo *b)
+{
+	int c = 0;
+	struct bar *d;
+	if (a == 0) {
+		d = func2(a);
+	} else {
+		c = func3(b);
+	}
+	return c;
+}
+
