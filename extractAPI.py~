@@ -326,7 +326,7 @@ def recurse_type(Node):
 if __name__ == '__main__':
 	s = raw_input()
 	ast = parse_file(s,use_cpp = True,cpp_args=[r'-I/home/aditya/Honors/2015/pycparser-2.10/utils/fake_libc_include/',r'-I/media/01CDF70B3FE14040/FFmpeg-master'])
-	#ast.show()
+	ast.show()
 	apilist = {}
 
 	for i in ast.ext:

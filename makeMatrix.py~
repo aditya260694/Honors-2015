@@ -20,7 +20,7 @@ def processData(filename):
 def printData():
 	for cl in funcClass:
 		vectorMatrix = []	
-		print "#" + str(cl)
+		print cl
 		funcApiList = funcClass[cl]
 		for func in funcApiList:
 			newVector = []

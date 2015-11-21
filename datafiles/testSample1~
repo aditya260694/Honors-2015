@@ -1,7 +1,7 @@
 #include "testfile.h"
 #define __attribute__(x)
 #define av_log_error 3
-#define volatile
+
 
 typedef int Node, Hash;
 int global1;
